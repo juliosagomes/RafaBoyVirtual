@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Gmail ZIP → PDF</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page">
+  <main>
+    <h1>Gmail ZIP → PDF</h1>
+    <p class="muted">Os arquivos <b>.txt</b> e <b>.csv</b> (inclusive dentro de .zip e subpastas) viram <b>.pdf</b>;
+      cada anexo .zip vira uma pasta dentro do .zip final. Tudo é processado localmente no seu navegador.</p>
+
+    <section id="manual" hidden>
+      <label id="drop" class="drop">
+        <input id="files" type="file" multiple hidden>
+        <span>Arraste os anexos aqui ou <u>clique para selecionar</u></span>
+      </label>
+      <p class="muted">Dica: no Gmail, “Baixar todos os anexos” gera um .zip — você pode usar os anexos individuais ou esse arquivo.</p>
+    </section>
+
+    <section id="result" hidden>
+      <p id="summary"></p>
+      <a id="download" class="primary button" download>Baixar novamente</a>
+    </section>
+
+    <ol id="log" class="log"></ol>
+  </main>
+  <script src="lib/jszip.min.js"></script>
+  <script src="lib/jspdf.umd.min.js"></script>
+  <script src="lib/jspdf.plugin.autotable.min.js"></script>
+  <script src="src/core.js"></script>
+  <script src="processor.js"></script>
+</body>
+</html>

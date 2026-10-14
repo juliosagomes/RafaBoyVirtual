@@ -1,0 +1,15 @@
+{
+  "name": "gmail-zip-to-pdf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Extensão do Chrome que converte .txt/.csv dos anexos .zip do Gmail em PDF.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "package": "cd extension && zip -r ../gmail-zip-to-pdf.zip . -x '*.DS_Store'"
+  },
+  "devDependencies": {
+    "jspdf": "4.2.1",
+    "jspdf-autotable": "5.0.8",
+    "jszip": "3.10.1"
+  }
+}
