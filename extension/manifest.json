@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Gmail ZIP → PDF",
-  "version": "1.0.0",
-  "description": "Converte os .txt e .csv dos anexos .zip de um e-mail do Gmail em PDF e entrega tudo em um único .zip.",
+  "name": "RafaBoy Virtual",
+  "version": "1.1.0",
+  "description": "Converte .txt, .csv, Word (.doc/.docx) e Excel (.xls/.xlsx) dos anexos .zip de um e-mail do Gmail em PDF e entrega tudo em um único .zip.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [
     "https://mail.google.com/*",
@@ -10,7 +10,7 @@
     "https://*.googleusercontent.com/*"
   ],
   "action": {
-    "default_title": "Converter anexos .zip em PDF",
+    "default_title": "RafaBoy Virtual — converter anexos em PDF",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

@@ -1,6 +1,6 @@
-/* global ZipPdfCore, JSZip, jspdf, autoTable */
+/* global ZipPdfCore, JSZip, jspdf, autoTable, mammoth, XLSX */
 const logEl = document.getElementById('log');
-const deps = { JSZip, jsPDF: jspdf.jsPDF, autoTable };
+const deps = { JSZip, jsPDF: jspdf.jsPDF, autoTable, mammoth, XLSX };
 
 function log(msg, level = 'info') {
   const li = document.createElement('li');
@@ -51,9 +51,10 @@ async function run(subject, attachments) {
   a.click();
 
   const secs = ((performance.now() - t0) / 1000).toFixed(1);
+  const converted = Object.entries(stats.converted).map(([ext, n]) => `${n} .${ext}`).join(', ') || 'nenhum arquivo';
   document.getElementById('summary').textContent =
-    `✅ Pronto em ${secs}s: ${stats.zips} .zip extraído(s), ${stats.txt} .txt e ${stats.csv} .csv convertidos, ` +
-    `${stats.copied} arquivo(s) copiado(s) sem alteração` + (stats.errors ? `, ${stats.errors} aviso(s).` : '.') +
+    `✅ Pronto em ${secs}s: ${stats.zips} .zip extraído(s); convertidos para PDF: ${converted}; ` +
+    `${stats.copied} arquivo(s) copiado(s) sem alteração` + (stats.errors ? `; ${stats.errors} aviso(s).` : '.') +
     ` Arquivo: “${fileName}”.`;
   document.getElementById('result').hidden = false;
   log('✅ Concluído.', 'ok');

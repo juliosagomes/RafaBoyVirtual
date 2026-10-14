@@ -6,9 +6,14 @@ const { execFileSync } = require('node:child_process');
 const JSZip = require('jszip');
 const { jsPDF } = require('jspdf');
 const { autoTable } = require('jspdf-autotable');
+const mammoth = require('mammoth');
+const XLSX = require('@e965/xlsx');
 const core = require('../extension/src/core.js');
+const office = require('../extension/src/office.js');
 
-const deps = { JSZip, jsPDF, autoTable };
+const deps = { JSZip, jsPDF, autoTable, mammoth, XLSX };
+const FIXTURES = path.join(__dirname, 'fixtures');
+const fixture = (name) => fs.readFileSync(path.join(FIXTURES, name));
 const OUT = path.join(__dirname, 'out');
 
 function hasPdftotext() {
@@ -105,7 +110,7 @@ test('builds output zip: zips become folders, txt/csv become pdf, others copied'
     'Lote 1/dados/sub/interno/profundo/nota.pdf',
     'Lote 1/dados/sub/interno/tabela.pdf',
     'Lote 1/dados/vendas.pdf',
-    'Lote 1/leia-me (2).pdf',
+    'Lote 1/leia-me (txt).pdf',
     'Lote 1/leia-me.pdf',
     'contrato.docx',
     'lote2/outro.pdf',
@@ -113,7 +118,8 @@ test('builds output zip: zips become folders, txt/csv become pdf, others copied'
     'solto.pdf',
   ]);
   assert.ok(out.files['Lote 1/vazia/'], 'empty folder kept');
-  assert.deepStrictEqual(stats, { zips: 4, txt: 4, csv: 3, copied: 4, errors: 0 });
+  // contrato.docx é inválido: a conversão falha e o original é mantido
+  assert.deepStrictEqual(stats, { zips: 4, converted: { txt: 4, csv: 3 }, copied: 4, errors: 1 });
 
   for (const f of files.filter((n) => n.endsWith('.pdf') && n !== 'Lote 1/leia-me.pdf')) {
     const head = Buffer.from(await out.file(f).async('uint8array')).subarray(0, 5).toString();
@@ -121,9 +127,9 @@ test('builds output zip: zips become folders, txt/csv become pdf, others copied'
   }
 
   if (hasPdftotext()) {
-    // leia-me.pdf (original) vem antes de leia-me.txt em ordem alfabética, então o convertido ganha " (2)"
+    // leia-me.pdf (original) vem antes de leia-me.txt em ordem alfabética, então o convertido ganha " (txt)"
     assert.strictEqual(await out.file('Lote 1/leia-me.pdf').async('string'), '%PDF-existing');
-    const txt = pdfText(await out.file('Lote 1/leia-me (2).pdf').async('uint8array'), 'leia-me.pdf');
+    const txt = pdfText(await out.file('Lote 1/leia-me (txt).pdf').async('uint8array'), 'leia-me.pdf');
     assert.match(txt, /Relatório de produção\s+com acentuação/);
     const csv = pdfText(await out.file('Lote 1/dados/vendas.pdf').async('uint8array'), 'vendas.pdf');
     assert.match(csv, /Produto\s+Preço\s+Qtd/);
@@ -148,4 +154,86 @@ test('large txt and wide csv produce multi-page PDFs', () => {
     assert.match(t2, /coluna_39/);
     assert.match(t2, /199-39/);
   }
+});
+
+test('registers Word and Excel converters', () => {
+  assert.deepStrictEqual(core.supportedExtensions().sort(), ['csv', 'doc', 'docs', 'docx', 'txt', 'xls', 'xlsx']);
+});
+
+test('Word and Excel inside a zip become PDFs', async () => {
+  const z = new JSZip();
+  z.file('docs/documento.docx', fixture('documento.docx'));
+  z.file('docs/antigo/documento.doc', fixture('documento.doc'));
+  z.file('docs/rtf.doc', fixture('rtf-disfarcado.doc'));
+  z.file('docs/digitado-errado.docs', fixture('documento.docx'));
+  z.file('planilhas/planilha.xlsx', fixture('planilha.xlsx'));
+  z.file('planilhas/planilha.xls', fixture('planilha.xls'));
+  z.file('planilhas/corrompida.xlsx', 'isto não é uma planilha');
+  const { content, stats } = await core.buildOutputZip(
+    [{ name: 'Office.zip', data: await z.generateAsync({ type: 'uint8array' }) }],
+    deps,
+    { outputType: 'uint8array' },
+  );
+  assert.deepStrictEqual(stats.converted, { doc: 2, docs: 1, docx: 1, xls: 1, xlsx: 2 });
+  assert.strictEqual(stats.errors, 0);
+
+  const out = await JSZip.loadAsync(content);
+  const files = Object.values(out.files).filter((f) => !f.dir).map((f) => f.name).sort();
+  assert.deepStrictEqual(files, [
+    'Office/docs/antigo/documento.pdf',
+    'Office/docs/digitado-errado.pdf',
+    'Office/docs/documento.pdf',
+    'Office/docs/rtf.pdf',
+    'Office/planilhas/corrompida.pdf',
+    'Office/planilhas/planilha (xlsx).pdf',
+    'Office/planilhas/planilha.pdf',
+  ]);
+  if (!hasPdftotext()) return;
+  const read = async (n) => pdfText(await out.file(n).async('uint8array'), n.replace(/\//g, '_'));
+
+  const docx = await read('Office/docs/documento.pdf');
+  assert.match(docx, /Relatório Mensal de Produção/);
+  assert.match(docx, /Texto com negrito e itálico — “aspas” e 10 €/);
+  assert.match(docx, /• Primeiro item/);
+  assert.match(docx, /2\. Passo dois/);
+  assert.match(docx, /Pão de queijo\s+10\s+0,80/);
+
+  const doc = await read('Office/docs/antigo/documento.pdf');
+  assert.match(doc, /Relatório Mensal de Produção/);
+  assert.match(doc, /Pão de queijo \| 10 \| 0,80/);
+
+  assert.match(await read('Office/docs/rtf.pdf'), /Olá mundo RTF\s+Segunda linha com ça/);
+
+  for (const n of ['Office/planilhas/planilha.pdf', 'Office/planilhas/planilha (xlsx).pdf']) {
+    const xls = await read(n);
+    assert.match(xls, /Planilha: Vendas/);
+    assert.match(xls, /15\/01\/2026\s+Café\s+12,5/);
+    assert.match(xls, /Açúcar\s+1\.234,57/);
+    assert.match(xls, /Planilha: Resumo/);
+    assert.doesNotMatch(xls, /Planilha: Vazia/);
+  }
+});
+
+test('broken Word file is kept as original with a warning', async () => {
+  const logs = [];
+  const { content, stats } = await core.buildOutputZip(
+    [{ name: 'quebrado.docx', data: Buffer.from('PK\x03\x04 lixo') }],
+    deps,
+    { outputType: 'uint8array', onLog: (m) => logs.push(m) },
+  );
+  assert.strictEqual(stats.errors, 1);
+  const out = await JSZip.loadAsync(content);
+  assert.ok(out.file('quebrado.docx'));
+  assert.ok(logs.some((m) => /Falha ao converter quebrado\.docx/.test(m)));
+});
+
+test('HTML parser and Word text cleanup', () => {
+  const tree = office.parseHtml('<p>a &amp; <strong>b</strong><br/>c</p><img src="x.png" />');
+  assert.strictEqual(tree.children[0].tag, 'p');
+  assert.strictEqual(tree.children[0].children[0].text, 'a & ');
+  assert.strictEqual(tree.children[1].attrs.src, 'x.png');
+  assert.strictEqual(
+    office.cleanWordText('Veja \x13 HYPERLINK "http://x" \x14o site\x15.\ra\x07b\x07\x07'),
+    'Veja o site.\na | b\n',
+  );
 });

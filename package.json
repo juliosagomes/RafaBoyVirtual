@@ -1,15 +1,17 @@
 {
-  "name": "gmail-zip-to-pdf",
-  "version": "1.0.0",
+  "name": "rafaboy-virtual",
+  "version": "1.1.0",
   "private": true,
-  "description": "Extensão do Chrome que converte .txt/.csv dos anexos .zip do Gmail em PDF.",
+  "description": "RafaBoy Virtual: extensão do Chrome que converte .txt, .csv, Word e Excel dos anexos .zip do Gmail em PDF.",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "package": "cd extension && zip -r ../gmail-zip-to-pdf.zip . -x '*.DS_Store'"
+    "package": "cd extension && zip -r ../rafaboy-virtual.zip . -x '*.DS_Store'"
   },
   "devDependencies": {
+    "@e965/xlsx": "0.20.3",
     "jspdf": "4.2.1",
     "jspdf-autotable": "5.0.8",
-    "jszip": "3.10.1"
+    "jszip": "3.10.1",
+    "mammoth": "1.13.0"
   }
 }

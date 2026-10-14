@@ -2,13 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Gmail ZIP → PDF</title>
+  <title>RafaBoy Virtual</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="page">
   <main>
-    <h1>Gmail ZIP → PDF</h1>
-    <p class="muted">Os arquivos <b>.txt</b> e <b>.csv</b> (inclusive dentro de .zip e subpastas) viram <b>.pdf</b>;
+    <h1>RafaBoy Virtual</h1>
+    <p class="muted">Os arquivos <b>.txt</b>, <b>.csv</b>, <b>.doc</b>, <b>.docx</b>, <b>.xls</b> e <b>.xlsx</b> (inclusive dentro de .zip e subpastas) viram <b>.pdf</b>;
       cada anexo .zip vira uma pasta dentro do .zip final. Tudo é processado localmente no seu navegador.</p>
 
     <section id="manual" hidden>
@@ -29,7 +29,10 @@
   <script src="lib/jszip.min.js"></script>
   <script src="lib/jspdf.umd.min.js"></script>
   <script src="lib/jspdf.plugin.autotable.min.js"></script>
+  <script src="lib/mammoth.browser.min.js"></script>
+  <script src="lib/xlsx.full.min.js"></script>
   <script src="src/core.js"></script>
+  <script src="src/office.js"></script>
   <script src="processor.js"></script>
 </body>
 </html>
