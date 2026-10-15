@@ -5,7 +5,8 @@
   "description": "RafaBoy Virtual: extensão do Chrome que converte .txt, .csv, Word e Excel dos anexos .zip do Gmail em PDF.",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "package": "cd extension && zip -r ../rafaboy-virtual.zip . -x '*.DS_Store'"
+    "package": "node scripts/package.js",
+    "store-assets": "node scripts/store-assets.js"
   },
   "devDependencies": {
     "@e965/xlsx": "0.20.3",

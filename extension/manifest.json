@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
   "name": "RafaBoy Virtual",
+  "short_name": "RafaBoy",
   "version": "1.1.0",
-  "description": "Converte .txt, .csv, Word (.doc/.docx) e Excel (.xls/.xlsx) dos anexos .zip de um e-mail do Gmail em PDF e entrega tudo em um único .zip.",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "description": "Converte em PDF os .txt, .csv, Word e Excel dos anexos .zip de um e-mail do Gmail e entrega tudo em um único .zip.",
+  "minimum_chrome_version": "102",
+  "permissions": ["scripting", "storage"],
   "host_permissions": [
     "https://mail.google.com/*",
-    "https://mail-attachment.googleusercontent.com/*",
-    "https://*.googleusercontent.com/*"
+    "https://mail-attachment.googleusercontent.com/*"
   ],
   "action": {
     "default_title": "RafaBoy Virtual — converter anexos em PDF",

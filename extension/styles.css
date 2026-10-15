@@ -25,3 +25,4 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
 .log:empty { display: none; }
 .log .warn { color: var(--warn); } .log .error { color: var(--err); } .log .ok { color: var(--ok); font-weight: 600; }
 #summary { font-weight: 500; }
+.small { font-size: 12px; margin: 10px 0 0; }

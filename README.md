@@ -77,6 +77,10 @@ extension/
 ├── src/gmail-scraper.js   # lê os anexos da página do Gmail
 ├── lib/                   # JSZip 3.10.1, jsPDF 4.2.1, jsPDF-AutoTable 5.0.8, mammoth 1.13.0, SheetJS 0.20.3
 └── icons/
+scripts/package.js         # valida e gera dist/rafaboy-virtual-<versão>.zip
+scripts/store-assets.js    # gera as imagens da Chrome Web Store
+store/                     # ícone, capturas, blocos promocionais e LISTING.md (textos da loja)
+PRIVACY.md, docs/          # política de privacidade (docs/privacy.html para publicar na web)
 test/core.test.js          # testes (Node)
 test/fixtures/             # arquivos Word/Excel de exemplo usados nos testes
 ```
@@ -86,8 +90,15 @@ test/fixtures/             # arquivos Word/Excel de exemplo usados nos testes
 ```bash
 npm install
 npm test          # testes da lógica de conversão
-npm run package   # gera rafaboy-virtual.zip para publicar na Chrome Web Store
+npm run package   # valida e gera dist/rafaboy-virtual-<versão>.zip para a Chrome Web Store
+npm run store-assets  # regenera as imagens da loja (requer Playwright/Chromium, poppler e Pillow)
 ```
+
+## Publicação na Chrome Web Store
+
+O passo a passo completo, com todos os textos para colar no painel (descrição, justificativa de permissões,
+práticas de privacidade e instruções para o revisor), está em [`store/LISTING.md`](store/LISTING.md).
+A política de privacidade está em [`PRIVACY.md`](PRIVACY.md).
 
 ## Limitações conhecidas
 
