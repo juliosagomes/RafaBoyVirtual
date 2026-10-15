@@ -96,6 +96,10 @@ npm run store-assets  # regenera as imagens da loja (requer Playwright/Chromium,
 
 ## Publicação na Chrome Web Store
 
+**Pacote automático (GitHub Actions):** a cada push, o workflow `.github/workflows/package.yml` roda os testes e
+`npm run package`; o .zip fica em *Actions → execução → Artifacts → rafaboy-virtual*. Para gerar um Release com o
+.zip anexado, crie uma tag igual à versão do manifest: `git tag v1.1.0 && git push origin v1.1.0`.
+
 O passo a passo completo, com todos os textos para colar no painel (descrição, justificativa de permissões,
 práticas de privacidade e instruções para o revisor), está em [`store/LISTING.md`](store/LISTING.md).
 A política de privacidade está em [`PRIVACY.md`](PRIVACY.md).
